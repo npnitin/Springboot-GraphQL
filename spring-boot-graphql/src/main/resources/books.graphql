@@ -7,6 +7,15 @@ type Book{
     publishedDate:String
 }
 
+type Mutation {
+    newBook(
+        isbn: String,
+        title: String,
+        publisher: String,
+        authors:[String],
+        publishedDate: String
+    ): Book
+}
 type Query{
     allBooks:[Book]
     book(id:String):Book
@@ -14,4 +23,5 @@ type Query{
 
 schema {
  query:Query
+    mutation:Mutation
 }

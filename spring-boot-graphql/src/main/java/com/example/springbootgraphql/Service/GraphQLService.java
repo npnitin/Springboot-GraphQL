@@ -1,5 +1,6 @@
 package com.example.springbootgraphql.Service;
 
+import com.example.springbootgraphql.Service.DataFetcher.AddBooksDataFetcher;
 import com.example.springbootgraphql.Service.DataFetcher.AllBooksDataFetcher;
 import com.example.springbootgraphql.Service.DataFetcher.BookDataFetcher;
 import com.example.springbootgraphql.model.Book;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Service
@@ -34,8 +37,12 @@ public class GraphQLService {
 
     @Autowired
     private AllBooksDataFetcher allBooksDataFetcher;
+
     @Autowired
     private BookDataFetcher bookDataFetcher;
+
+    @Autowired
+    private AddBooksDataFetcher addBooksDataFetcher;
 
     @PostConstruct
     private void loadSchema() throws IOException {
@@ -51,10 +58,13 @@ public class GraphQLService {
 
     private void loadDatainHSQL() {
 
+        List<String> authors = new ArrayList<>();
+        authors.add("Roger s pressman");
+        authors.add("Peter bare galvin");
         Stream.of(
-            new Book("1","SE","Test",new String[]{"Roger s Pressman"},"date"),
-                new Book("123","OS","MAcgrawhill",new String[]{"Peter bare Galvin"},"12-july-2019"),
-                new Book("tt2t","DBMS","TAklj",new String[]{"Korth"},"19-may-2019")
+            new Book("1","SE","Test",authors,"date"),
+                new Book("123","OS","MAcgrawhill",authors,"12-july-2019"),
+                new Book("tt2t","DBMS","TAklj",authors,"19-may-2019")
         ).forEach(book->{
             bookRepository.save(book);
         });
@@ -66,6 +76,8 @@ public class GraphQLService {
                     typeWiring.
                             dataFetcher("allBooks",allBooksDataFetcher)
                             .dataFetcher("book",bookDataFetcher))
+                .type("Mutation", typeWiring ->
+                        typeWiring.dataFetcher("newBook", addBooksDataFetcher))
                 .build();
 
     }
